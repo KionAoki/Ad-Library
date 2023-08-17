@@ -9,6 +9,7 @@ packages = [{include = "ad_library"}]
 [tool.poetry.dependencies]
 python = "^3.10"
 requests = "^2.31.0"
+iso3166 = "^2.1.1"
 
 
 [build-system]
