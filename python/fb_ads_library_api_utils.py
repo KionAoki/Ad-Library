@@ -12,30 +12,25 @@ supported_countries = [
     "TW"
 ]
 valid_query_fields = [
+    "id",
     "ad_creation_time",
-    "ad_creative_body",
     "ad_creative_bodies",
-    "ad_creative_link_caption",
     "ad_creative_link_captions",
-    "ad_creative_link_description",
     "ad_creative_link_descriptions",
-    "ad_creative_link_title",
     "ad_creative_link_titles",
     "ad_delivery_start_time",
     "ad_delivery_stop_time",
     "ad_snapshot_url",
+    "bylines",
     "currency",
     "delivery_by_region",
     "demographic_distribution",
-    "bylines",
-    "id",
+    "estimated_audience_size",
     "impressions",
     "languages",
     "page_id",
     "page_name",
-    "potential_reach",
     "publisher_platforms",
-    "region_distribution",
     "spend",
 ]
 
