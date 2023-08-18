@@ -35,7 +35,6 @@ def get_parser():
         "-c",
         "--country",
         help="Comma-separated country code (no spaces)",
-        required=True,
         type=validate_country_param,
     )
     parser.add_argument(
@@ -116,7 +115,7 @@ def main():
     else:
         search_term = opts.search_term
     api = FbAdsLibraryTraversal(
-        opts.access_token, opts.fields, search_term, opts.country
+        opts.access_token, opts.fields, search_term
     )
     if opts.search_page_ids:
         api.search_page_ids = opts.search_page_ids
