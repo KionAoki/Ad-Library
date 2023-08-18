@@ -45,7 +45,7 @@ def get_parser():
         help="Filter by the current status of the ads at the moment the script runs",
     )
     parser.add_argument(
-        "--after-date", help="Only return ads that started delivery after this date"
+        "--ad_delivery_date_min", help="Only return ads that started delivery after this date"
     )
     parser.add_argument("--batch-size", type=int, help="Batch size")
     parser.add_argument(
@@ -125,8 +125,8 @@ def main():
         api.page_limit = opts.batch_size
     if opts.retry_limit:
         api.retry_limit = opts.retry_limit
-    if opts.after_date:
-        api.after_date = opts.after_date
+    if opts.ad_delivery_date_min:
+        api.ad_delivery_date_min = opts.ad_delivery_date_min
     generator_ad_archives = api.generate_ad_archives()
     if opts.action in get_operators():
         if opts.action == "save_to_csv":
