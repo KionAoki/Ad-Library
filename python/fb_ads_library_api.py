@@ -37,6 +37,7 @@ class FbAdsLibraryTraversal:
         search_page_ids="",
         ad_active_status="ALL",
         ad_delivery_date_min="2022-01-01",
+        ad_delivery_date_max="",
         page_limit=500,
         api_version=None,
         retry_limit=3,
@@ -47,6 +48,7 @@ class FbAdsLibraryTraversal:
         self.search_term = search_term
         self.country = country
         self.ad_delivery_date_min = ad_delivery_date_min
+        self.ad_delivery_date_max = ad_delivery_date_max
         self.search_page_ids = search_page_ids
         self.ad_active_status = ad_active_status
         self.page_limit = page_limit
@@ -67,17 +69,27 @@ class FbAdsLibraryTraversal:
             self.ad_active_status,
             self.page_limit,
         )
-        return self.__class__._get_ad_archives_from_url(
-            next_page_url, ad_delivery_date_min=self.ad_delivery_date_min, retry_limit=self.retry_limit
+        if self.ad_delivery_date_max:
+            return self.__class__._get_ad_archives_from_url(
+                next_page_url, ad_delivery_date_min=self.ad_delivery_date_min, retry_limit=self.retry_limit,ad_delivery_date_max=self.ad_delivery_date_max
+            )
+        else:
+            return self.__class__._get_ad_archives_from_url(
+                next_page_url, ad_delivery_date_min=self.ad_delivery_date_min, retry_limit=self.retry_limit
         )
 
     @staticmethod
     def _get_ad_archives_from_url(
-        next_page_url, ad_delivery_date_min="1970-01-01", retry_limit=3
+        next_page_url, ad_delivery_date_min="2022-01-01", retry_limit=3,ad_delivery_date_max=""
     ):
         last_error_url = None
         last_retry_count = 0
         start_time_cutoff_after = datetime.strptime(ad_delivery_date_min, "%Y-%m-%d").timestamp()
+
+        if ad_delivery_date_max:
+            start_time_cutoff_before = datetime.strptime(ad_delivery_date_max, "%Y-%m-%d").timestamp()
+        else:
+            start_time_cutoff_before = ""
 
         while next_page_url is not None:
             response = requests.get(next_page_url)
@@ -96,19 +108,35 @@ class FbAdsLibraryTraversal:
                     last_retry_count = 0
                 last_retry_count += 1
                 continue
-
-            filtered = list(
-                filter(
-                    lambda ad_archive: ("ad_delivery_start_time" in ad_archive)
-                    and (
-                        datetime.strptime(
-                            ad_archive["ad_delivery_start_time"], "%Y-%m-%d"
-                        ).timestamp()
-                        >= start_time_cutoff_after
-                    ),
-                    response_data["data"],
+            
+            if start_time_cutoff_before:
+                filtered = list(
+                    filter(
+                        lambda ad_archive: ("ad_delivery_start_time" in ad_archive)
+                        and (
+                            start_time_cutoff_before >=
+                            datetime.strptime(
+                                ad_archive["ad_delivery_start_time"], "%Y-%m-%d"
+                            ).timestamp()
+                            >= start_time_cutoff_after
+                        ),
+                        response_data["data"],
+                    )
                 )
-            )
+            else:
+                filtered = list(
+                    filter(
+                        lambda ad_archive: ("ad_delivery_start_time" in ad_archive)
+                        and (
+                            datetime.strptime(
+                                ad_archive["ad_delivery_start_time"], "%Y-%m-%d"
+                            ).timestamp()
+                            >= start_time_cutoff_after
+                        ),
+                        response_data["data"],
+                    )
+                )
+
             if len(filtered) == 0:
                 # if no data after the ad_delivery_date_min, break
                 next_page_url = None
@@ -121,7 +149,7 @@ class FbAdsLibraryTraversal:
                 next_page_url = None
 
     @classmethod
-    def generate_ad_archives_from_url(cls, failure_url, ad_delivery_date_min="1970-01-01"):
+    def generate_ad_archives_from_url(cls, failure_url, ad_delivery_date_min="2022-01-01"):
         """
         if we failed from error, later we can just continue from the last failure url
         """
