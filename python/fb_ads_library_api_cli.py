@@ -30,12 +30,12 @@ def get_parser():
         required=True,
         type=validate_fields_param,
     )
-    parser.add_argument("-s", "--search-term", help="The term you want to search for")
+    parser.add_argument("-s", "--search-term",
+                        help="The term you want to search for")
     parser.add_argument(
         "-c",
         "--country",
         help="Comma-separated country code (no spaces)",
-        required=True,
         type=validate_country_param,
     )
     parser.add_argument(
@@ -46,7 +46,10 @@ def get_parser():
         help="Filter by the current status of the ads at the moment the script runs",
     )
     parser.add_argument(
-        "--after-date", help="Only return ads that started delivery after this date"
+        "--ad_delivery_date_min", help="Only return ads that started delivery after this date"
+    )
+    parser.add_argument(
+        "--ad_delivery_date_max", help="Only return ads that started delivery before this date"
     )
     parser.add_argument("--batch-size", type=int, help="Batch size")
     parser.add_argument(
@@ -71,7 +74,8 @@ def validate_country_param(country_input):
     country_list = list(filter(lambda x: x.strip(), country_input.split(",")))
     if not country_list:
         raise argparse.ArgumentTypeError("Country cannot be empty")
-    valid_country_codes = list(map(lambda x: get_country_code(x), country_list))
+    valid_country_codes = list(
+        map(lambda x: get_country_code(x), country_list))
     invalid_inputs = {
         key: value
         for (key, value) in zip(country_list, valid_country_codes)
@@ -80,7 +84,8 @@ def validate_country_param(country_input):
 
     if invalid_inputs:
         raise argparse.ArgumentTypeError(
-            "Invalid/unsupported country code: %s" % (",".join(invalid_inputs.keys()))
+            "Invalid/unsupported country code: %s" % (
+                ",".join(invalid_inputs.keys()))
         )
     else:
         return ",".join(valid_country_codes)
@@ -94,7 +99,8 @@ def validate_fields_param(fields_input):
     )
     if not fields_list:
         raise argparse.ArgumentTypeError("Fields cannot be empty")
-    invalid_fields = list(filter(lambda x: not is_valid_fields(x), fields_list))
+    invalid_fields = list(
+        filter(lambda x: not is_valid_fields(x), fields_list))
     if not invalid_fields:
         return ",".join(fields_list)
     else:
@@ -116,7 +122,7 @@ def main():
     else:
         search_term = opts.search_term
     api = FbAdsLibraryTraversal(
-        opts.access_token, opts.fields, search_term, opts.country
+        opts.access_token, opts.fields, search_term
     )
     if opts.search_page_ids:
         api.search_page_ids = opts.search_page_ids
@@ -126,8 +132,10 @@ def main():
         api.page_limit = opts.batch_size
     if opts.retry_limit:
         api.retry_limit = opts.retry_limit
-    if opts.after_date:
-        api.after_date = opts.after_date
+    if opts.ad_delivery_date_min:
+        api.ad_delivery_date_min = opts.ad_delivery_date_min
+    if opts.ad_delivery_date_max:
+        api.ad_delivery_date_max = opts.ad_delivery_date_max
     generator_ad_archives = api.generate_ad_archives()
     if opts.action in get_operators():
         if opts.action == "save_to_csv":
