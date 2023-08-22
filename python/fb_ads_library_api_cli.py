@@ -30,7 +30,8 @@ def get_parser():
         required=True,
         type=validate_fields_param,
     )
-    parser.add_argument("-s", "--search-term", help="The term you want to search for")
+    parser.add_argument("-s", "--search-term",
+                        help="The term you want to search for")
     parser.add_argument(
         "-c",
         "--country",
@@ -73,7 +74,8 @@ def validate_country_param(country_input):
     country_list = list(filter(lambda x: x.strip(), country_input.split(",")))
     if not country_list:
         raise argparse.ArgumentTypeError("Country cannot be empty")
-    valid_country_codes = list(map(lambda x: get_country_code(x), country_list))
+    valid_country_codes = list(
+        map(lambda x: get_country_code(x), country_list))
     invalid_inputs = {
         key: value
         for (key, value) in zip(country_list, valid_country_codes)
@@ -82,7 +84,8 @@ def validate_country_param(country_input):
 
     if invalid_inputs:
         raise argparse.ArgumentTypeError(
-            "Invalid/unsupported country code: %s" % (",".join(invalid_inputs.keys()))
+            "Invalid/unsupported country code: %s" % (
+                ",".join(invalid_inputs.keys()))
         )
     else:
         return ",".join(valid_country_codes)
@@ -96,7 +99,8 @@ def validate_fields_param(fields_input):
     )
     if not fields_list:
         raise argparse.ArgumentTypeError("Fields cannot be empty")
-    invalid_fields = list(filter(lambda x: not is_valid_fields(x), fields_list))
+    invalid_fields = list(
+        filter(lambda x: not is_valid_fields(x), fields_list))
     if not invalid_fields:
         return ",".join(fields_list)
     else:

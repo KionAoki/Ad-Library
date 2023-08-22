@@ -33,7 +33,7 @@ class FbAdsLibraryTraversal:
         access_token,
         fields,
         search_term,
-        country = "TW",
+        country="TW",
         search_page_ids="",
         ad_active_status="ALL",
         ad_delivery_date_min="2022-01-01",
@@ -71,23 +71,25 @@ class FbAdsLibraryTraversal:
         )
         if self.ad_delivery_date_max:
             return self.__class__._get_ad_archives_from_url(
-                next_page_url, ad_delivery_date_min=self.ad_delivery_date_min, retry_limit=self.retry_limit,ad_delivery_date_max=self.ad_delivery_date_max
+                next_page_url, ad_delivery_date_min=self.ad_delivery_date_min, retry_limit=self.retry_limit, ad_delivery_date_max=self.ad_delivery_date_max
             )
         else:
             return self.__class__._get_ad_archives_from_url(
                 next_page_url, ad_delivery_date_min=self.ad_delivery_date_min, retry_limit=self.retry_limit
-        )
+            )
 
     @staticmethod
     def _get_ad_archives_from_url(
-        next_page_url, ad_delivery_date_min="2022-01-01", retry_limit=3,ad_delivery_date_max=""
+        next_page_url, ad_delivery_date_min="2022-01-01", retry_limit=3, ad_delivery_date_max=""
     ):
         last_error_url = None
         last_retry_count = 0
-        start_time_cutoff_after = datetime.strptime(ad_delivery_date_min, "%Y-%m-%d").timestamp()
+        start_time_cutoff_after = datetime.strptime(
+            ad_delivery_date_min, "%Y-%m-%d").timestamp()
 
         if ad_delivery_date_max:
-            start_time_cutoff_before = datetime.strptime(ad_delivery_date_max, "%Y-%m-%d").timestamp()
+            start_time_cutoff_before = datetime.strptime(
+                ad_delivery_date_max, "%Y-%m-%d").timestamp()
         else:
             start_time_cutoff_before = ""
 
@@ -100,7 +102,8 @@ class FbAdsLibraryTraversal:
                     if last_retry_count >= retry_limit:
                         raise Exception(
                             "Error message: [{}], failed on URL: [{}]".format(
-                                json.dumps(response_data["error"]), next_page_url
+                                json.dumps(
+                                    response_data["error"]), next_page_url
                             )
                         )
                 else:
@@ -108,11 +111,12 @@ class FbAdsLibraryTraversal:
                     last_retry_count = 0
                 last_retry_count += 1
                 continue
-            
+
             if start_time_cutoff_before:
                 filtered = list(
                     filter(
-                        lambda ad_archive: ("ad_delivery_start_time" in ad_archive)
+                        lambda ad_archive: (
+                            "ad_delivery_start_time" in ad_archive)
                         and (
                             start_time_cutoff_before >=
                             datetime.strptime(
@@ -126,7 +130,8 @@ class FbAdsLibraryTraversal:
             else:
                 filtered = list(
                     filter(
-                        lambda ad_archive: ("ad_delivery_start_time" in ad_archive)
+                        lambda ad_archive: (
+                            "ad_delivery_start_time" in ad_archive)
                         and (
                             datetime.strptime(
                                 ad_archive["ad_delivery_start_time"], "%Y-%m-%d"

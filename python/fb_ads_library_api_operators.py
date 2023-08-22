@@ -87,7 +87,8 @@ def save_to_csv(generator_ad_archives, args, fields, is_verbose=False):
                     elif type(value) == list:
                         value = delimiter.join(value)
                     output += (
-                        '"' + value.replace("\n", "").replace('"', "") + '"' + delimiter
+                        '"' + value.replace("\n", "").replace('"',
+                                                              "") + '"' + delimiter
                     )
                 else:
                     output += delimiter
@@ -106,7 +107,8 @@ def count_start_time_trending(generator_ad_archives, args, is_verbose=False):
         output_file: path to write the csv
     """
     if len(args) != 1:
-        raise Exception("start_time_trending action takes 1 arguments: output_file")
+        raise Exception(
+            "start_time_trending action takes 1 arguments: output_file")
 
     total_count = 0
     output_file = args[0]
